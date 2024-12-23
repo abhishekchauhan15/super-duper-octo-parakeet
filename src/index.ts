@@ -4,8 +4,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 // import authRoutes from './routes/auth';
-import KAM from './models/KAM';
-// import restaurantRoutes from './routes/restaurant';
+// import KAM from './models/KAM';
+
 
 dotenv.config();
 
@@ -18,10 +18,9 @@ app.use(bodyParser.json());
 
 // Routes
 // app.use('/api/auth', authRoutes);
-// app.use('/api/restaurants', restaurantRoutes);
 
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
-    console.log("req is here yeee ............")
+    console.log("req is here ............")
     res.json({message: "got the req"})
 })
 
