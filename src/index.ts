@@ -5,9 +5,11 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import connectDB from "./db";
 import { auth } from "./middleware/auth";
-import userRoutes from "./routes/userRoutes"; 
-import leadRoutes from "./routes/leadRoutes"; 
+import userRoutes from "./routes/userRoutes";
+import leadRoutes from "./routes/leadRoutes";
 import contactRoutes from "./routes/contactRoutes";
+import performanceRoutes from "./routes/performanceRoutes";
+import interactionRoutes from "./routes/interactionRoutes";
 dotenv.config();
 
 const app = express();
@@ -24,11 +26,13 @@ connectDB();
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/leads', auth , leadRoutes);
-app.use('/api/contacts', auth , contactRoutes);
+app.use("/api/contacts", contactRoutes);
+app.use("/api/performance", auth, performanceRoutes);
+app.use("/api/interactions", auth, interactionRoutes);
+
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  console.log("req is here ............");
-  res.json({ message: "got the req" });
+  res.json({ message: "Server is working!!!" });
 });
 
 

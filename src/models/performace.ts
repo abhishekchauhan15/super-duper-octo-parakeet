@@ -21,8 +21,5 @@ interface IAccountPerformance extends Document {
     updatedAt: { type: Date, default: Date.now },
   });
   
-  export const AccountPerformance = mongoose.model<IAccountPerformance>(
-    "AccountPerformance",
-    AccountPerformanceSchema
-  );
+  export const AccountPerformance = mongoose.model<IAccountPerformance>("AccountPerformance", AccountPerformanceSchema);
   
