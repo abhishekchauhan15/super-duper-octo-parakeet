@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import User from "../models/user";
+import { generateToken } from "../middleware/auth";
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
@@ -12,14 +13,27 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
+
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ message: "Invalid credentials" });
+
+    if (!user) {
+       res.status(404).json({ error: "User not found" });
+       return 
     }
-    res.status(200).json({ message: "Login successful", user });
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+       res.status(401).json({ error: "Invalid credentials" });
+       return 
+    }
+
+    const token = generateToken((user as any)._id.toString()); 
+    res.status(200).json({ message: "Login successful", token });
+    return;
+
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
