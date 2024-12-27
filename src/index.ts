@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-import authRoutes from './routes/auth';
-import KAM from './models/user';
+import userRoutes from "./routes/userRoutes"; 
 
 dotenv.config();
 
@@ -16,7 +15,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   console.log("req is here ............");
