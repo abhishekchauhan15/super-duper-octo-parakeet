@@ -7,6 +7,7 @@ import connectDB from "./db";
 import { auth } from "./middleware/auth";
 import userRoutes from "./routes/userRoutes"; 
 import leadRoutes from "./routes/leadRoutes"; 
+import contactRoutes from "./routes/contactRoutes";
 dotenv.config();
 
 const app = express();
@@ -23,6 +24,7 @@ connectDB();
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/leads', auth , leadRoutes);
+app.use('/api/contacts', auth , contactRoutes);
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   console.log("req is here ............");
