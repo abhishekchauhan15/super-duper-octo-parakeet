@@ -1,4 +1,3 @@
-// models/Lead.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 // Lead Interface
@@ -22,7 +21,7 @@ const LeadSchema: Schema = new Schema<ILead>({
   status: { type: String, enum: ["New", "Contacted", "Qualified", "Closed"], required: true },
   callFrequency: { type: Number, required: true },
   lastCalledDate: { type: Date, default: null },
-  pointsOfContact: [{ type: Schema.Types.ObjectId, ref: "Contact" }], // References to contacts
+  pointsOfContact: [{ type: Schema.Types.ObjectId, ref: "Contact" }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

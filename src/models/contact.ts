@@ -1,9 +1,8 @@
-// models/Contact.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 // Contact Interface
 interface IContact extends Document {
-  leadId: mongoose.Types.ObjectId; // Reference to the lead
+  leadId: mongoose.Types.ObjectId;
   name: string;
   role: "Owner" | "Manager";
   phoneNumber: string;

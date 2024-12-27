@@ -1,5 +1,4 @@
 import express, { Request, Response, NextFunction } from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
@@ -10,6 +9,7 @@ import leadRoutes from "./routes/leadRoutes";
 import contactRoutes from "./routes/contactRoutes";
 import performanceRoutes from "./routes/performanceRoutes";
 import interactionRoutes from "./routes/interactionRoutes";
+
 dotenv.config();
 
 const app = express();
@@ -21,7 +21,6 @@ app.use(bodyParser.json());
 
 // Connect to MongoDB
 connectDB();
-
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -39,3 +38,5 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
 );
+
+export default app;

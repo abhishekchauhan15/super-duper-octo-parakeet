@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 // Account Performance Interface
 interface IAccountPerformance extends Document {

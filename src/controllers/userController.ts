@@ -5,6 +5,40 @@ import { generateToken } from "../middleware/auth";
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password, role } = req.body;
+
+    // Required fields check
+    if (!name || !email || !password || !role) {
+       res.status(400).json({ error: "All fields are required" });
+       return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+       res.status(400).json({ error: "Invalid email format" });
+       return
+    }
+
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+       res.status(400).json({ error: "Email already in use" });
+       return
+    }
+
+    // Password validation
+    if (password.length < 8) {
+       res.status(400).json({ error: "Password must be at least 8 characters long" });
+       return
+    }
+
+    // Role validation (example roles)
+    const validRoles = ['KAM', 'Admin'];
+    if (!validRoles.includes(role)) {
+       res.status(400).json({ error: "Invalid role" });
+       return
+    }
+
     const user = new User({ name, email, password, role });
     await user.save();
     res.status(201).json({ message: "User registered successfully", user });

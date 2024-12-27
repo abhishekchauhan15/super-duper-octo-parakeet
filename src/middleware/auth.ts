@@ -1,9 +1,8 @@
-// src/middleware/auth.ts
 import jwt from 'jsonwebtoken';
 import { Types } from 'mongoose'
 import { Request, Response, NextFunction } from 'express';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'jwt_secret';
 
 export const generateToken = (userId: Types.ObjectId | string): string => {
   return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '1h' });
