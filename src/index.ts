@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-// import authRoutes from './routes/auth';
-// import KAM from './models/KAM';
+import authRoutes from './routes/auth';
+import KAM from './models/user';
 
 dotenv.config();
 
@@ -16,16 +16,13 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   console.log("req is here ............");
   res.json({ message: "got the req" });
 });
 
-app.get("/ci", (req, res) => {
-  res.json({ message: "CI/ CD added" });
-});
 
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
