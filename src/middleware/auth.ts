@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 const JWT_SECRET = process.env.JWT_SECRET || 'jwt_secret';
 
 export const generateToken = (userId: Types.ObjectId | string): string => {
-  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '1d' });
 };
 
 interface JwtPayload {

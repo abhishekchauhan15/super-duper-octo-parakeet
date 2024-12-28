@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../index";
 import { Lead } from "../models/lead";
 import User from '../models/user';
+import mongoose from 'mongoose';
 
 let token: string;
 

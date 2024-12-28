@@ -14,8 +14,16 @@ export interface IUser extends Document {
 const UserSchema: Schema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: "User" },
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  email: { 
+    type: String, 
+    required: true, 
+    unique: true, 
+    validate: { 
+      validator: (v: string) => /^\S+@\S+\.\S+$/.test(v), 
+      message: (props: { value: string }) => `${props.value} is not a valid email!` 
+    }
+  },
+  password: { type: String, required: true, validate: { validator: (v: string) => v.length >= 8, message: (props: { value: string }) => `${props.value} is not a valid password!` } },
   role: { type: String, required: true },
 });
 

@@ -1,9 +1,9 @@
-import express from "express";
-import { addPerformance, getPerformanceByLead } from "../controllers/performanceController";
+// import express from "express";
+// import { addPerformance, getPerformanceByLead } from "../controllers/performanceController";
 
-const router = express.Router();
+// const router = express.Router();
 
-router.post("/", addPerformance);
-router.get("/:leadId", getPerformanceByLead);
+// router.post("/", addPerformance);
+// router.get("/:leadId", getPerformanceByLead);
 
-export default router;
+// export default router;
