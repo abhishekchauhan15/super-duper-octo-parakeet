@@ -37,7 +37,7 @@ export const getLeadStatusById = async (req: Request, res: Response) => {
        res.status(404).json({ message: "Lead not found" });
        return 
     }
-    res.status(200).json({status: lead.status});
+    res.status(200).json({lead});
 } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

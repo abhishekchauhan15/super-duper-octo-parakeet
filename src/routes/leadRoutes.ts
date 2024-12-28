@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/", createLead);
 router.get("/", getAllLeads);
 router.get("/:id", getLeadStatusById);
-router.put("/:id", updateLead);
+router.patch("/:id", updateLead);
 router.delete("/:id", deleteLead);
 router.get("/call-planning/today", getLeadsRequiringCallsToday);
 
