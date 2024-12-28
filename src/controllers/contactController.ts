@@ -1,27 +1,27 @@
 import { Request, Response } from "express";
 import { Contact } from "../models/contact";
 
-// Add Contact
+
 export const addContact = async (req: Request, res: Response) => {
-    const { name, email, phoneNumber, role } = req.body;
-  // Validate input
+    const {leadId, name, email, role,phoneNumber } = req.body;
+
   if (!name || !role || !phoneNumber || !email) {
      res.status(400).json({ error: "Missing required fields" });
      return
   }
   
   try {
-    const contact = new Contact({ name, email, phoneNumber, role });
+    const contact = new Contact({ leadId, name, email, role, phoneNumber });
     await contact.save();
-    res.status(201).json(contact);
+    res.status(201).json({ message: "Contact added successfully"});
   } catch (error: any) {
     res.status(500).json({ error: "Error adding contact", message: error.message });
   }
 };
 
-// Get Contacts for a Lead
+
 export const getContactsForLead = async (req: Request, res: Response) => {
-  // Validate leadId parameter
+
   if (!req.params.leadId) {
      res.status(400).json({ error: "Missing leadId parameter" });
      return

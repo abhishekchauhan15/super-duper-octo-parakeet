@@ -10,12 +10,12 @@ interface ILead extends Document {
   callFrequency: number; // In days
   lastInteractionDate: Date | null;
   preferredTimezone: string;
-  nextCallDate: Date,
+  nextCallDate: Date;
   performanceRating: "High" | "Medium" | "Low";
   pointsOfContact: mongoose.Types.ObjectId[]; // Array of references to POCs
+  lastOrderDate?: Date;
   createdAt: Date;
   updatedAt: Date;
-
 }
 
 // Lead Schema
@@ -59,15 +59,19 @@ const LeadSchema: Schema = new Schema<ILead>({
     type: Date, 
     default: null 
   },
-   nextCallDate: { 
+  nextCallDate: { 
     type: Date, 
-    required: true,   
+    required: false,   
     validate: {
       validator: (v: Date) => v > new Date(),
       message: props => `Next call date must be in the future!`
     }
   },
-  performanceRating: { type: String, enum: ["High", "Medium", "Low"], required: true },
+  performanceRating: { 
+    type: String, 
+    enum: ["High", "Medium", "Low"], 
+    required: false 
+  },
   preferredTimezone: { 
     type: String, 
     required: true,
@@ -82,6 +86,9 @@ const LeadSchema: Schema = new Schema<ILead>({
     type: Schema.Types.ObjectId, 
     ref: "Contact" 
   }],
+  lastOrderDate: {
+    type: Date
+  },
   createdAt: { 
     type: Date, 
     default: Date.now 
@@ -89,8 +96,13 @@ const LeadSchema: Schema = new Schema<ILead>({
   updatedAt: { 
     type: Date, 
     default: Date.now 
-  },
+  }
 });
+
+// Add indexes for efficient querying
+LeadSchema.index({ status: 1, nextCallDate: 1 });
+LeadSchema.index({ performanceRating: 1 });
+LeadSchema.index({ priorityScore: -1 });
 
 export const Lead = mongoose.model<ILead>("Lead", LeadSchema);
 export type { ILead };

@@ -1,68 +1,117 @@
-// import { Request, Response } from "express";
-// import { AccountPerformance } from "../models/performace";
-// import mongoose from "mongoose";
+import { Request, Response } from 'express';
+import { Order, IOrder } from '../models/order';
+import { Lead } from '../models/lead';
+import { Types } from 'mongoose';
 
-// // Add Performance Data
-// export const addPerformance = async (req: Request, res: Response) => {
-//   try {
-//     const { leadId, totalOrders, orderFrequency, performanceRating } = req.body;
+export const getAccountPerformance = async (req: Request, res: Response) => {
+  try {
+    const { leadId } = req.params;
+    const timeframe = req.query.timeframe || '30'; // Default to 30 days
 
-//     // Required fields check
-//     if (!leadId || totalOrders === undefined || orderFrequency === undefined || !performanceRating) {
-//        res.status(400).json({ error: "All fields are required" });
-//        return
-//     }
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - parseInt(timeframe as string));
 
-//     // Type validation
-//     if (typeof totalOrders !== 'number' || totalOrders < 0) {
-//        res.status(400).json({ error: "Total orders must be a non-negative number" });
-//        return
-//     }
-//     if (typeof orderFrequency !== 'number' || orderFrequency < 0) {
-//        res.status(400).json({ error: "Order frequency must be a non-negative number" });
-//        return
-//     }
+    const orders = await Order.find({
+      leadId: new Types.ObjectId(leadId),
+      createdAt: { $gte: startDate, $lte: endDate }
+    });
 
-//     // Enum validation
-//     const validRatings = ["High", "Medium", "Low"];
-//     if (!validRatings.includes(performanceRating)) {
-//        res.status(400).json({ error: "Invalid performance rating" });
-//        return
-//     }
+    const totalOrders = orders.length;
+    const totalValue = orders.reduce((sum: number, order: IOrder) => sum + order.amount, 0);
+    const averageOrderValue = totalOrders > 0 ? totalValue / totalOrders : 0;
 
-//     // Lead existence check
-//     if (!mongoose.Types.ObjectId.isValid(leadId)) {
-//        res.status(400).json({ error: "Invalid lead ID format" });
-//        return
-//     }
+    res.json({
+      totalOrders,
+      totalValue,
+      averageOrderValue,
+      timeframe
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching account performance' });
+  }
+};
 
-//     const performance = new AccountPerformance({ leadId, totalOrders, orderFrequency, performanceRating });
-//     await performance.save();
-//     res.status(201).json({ message: "Performance data added successfully", performance });
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+export const getOrderingPatterns = async (req: Request, res: Response) => {
+  try {
+    const { leadId } = req.params;
+    const timeframe = req.query.timeframe || '90'; // Default to 90 days
 
-// // Get Performance by Lead
-// export const getPerformanceByLead = async (req: Request, res: Response) => {
-//   try {
-//     const { leadId } = req.params;
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - parseInt(timeframe as string));
 
-//     // Lead existence check
-//     if (!mongoose.Types.ObjectId.isValid(leadId)) {
-//      res.status(400).json({ error: "Invalid lead ID format" });
-//      return
-//     }
+    const orders = await Order.find({
+      leadId: new Types.ObjectId(leadId),
+      createdAt: { $gte: startDate, $lte: endDate }
+    }).sort({ createdAt: 1 });
 
-//     const performance = await AccountPerformance.findOne({ leadId });
-//     if (!performance) {
-//        res.status(404).json({ message: "No performance records found for this lead" });
-//        return
-//     }
+    // Calculate ordering patterns
+    const orderDates = orders.map((order: IOrder) => order.createdAt);
+    const intervals: number[] = [];
+    for (let i = 1; i < orderDates.length; i++) {
+      const diff = orderDates[i].getTime() - orderDates[i-1].getTime();
+      intervals.push(diff / (1000 * 60 * 60 * 24)); // Convert to days
+    }
 
-//     res.status(200).json(performance);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+    const averageInterval = intervals.length > 0 
+      ? intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length 
+      : 0;
+
+    res.json({
+      totalOrders: orders.length,
+      averageOrderInterval: averageInterval,
+      orderDates,
+      timeframe
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching ordering patterns' });
+  }
+};
+
+export const getUnderperformingAccounts = async (req: Request, res: Response) => {
+  try {
+    const timeframe = req.query.timeframe || '30'; // Default to 30 days
+    const threshold = req.query.threshold || '1'; // Minimum expected orders per month
+
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - parseInt(timeframe as string));
+
+    // Get all leads
+    const leads = await Lead.find();
+    const underperformingAccounts = [];
+
+    for (const lead of leads) {
+      const orders = await Order.find({
+        leadId: lead._id,
+        createdAt: { $gte: startDate, $lte: endDate }
+      });
+
+      const orderCount = orders.length;
+      const expectedOrders = (parseInt(timeframe as string) / 30) * parseInt(threshold as string);
+
+      if (orderCount < expectedOrders) {
+        underperformingAccounts.push({
+          lead: {
+            _id: lead._id,
+            name: lead.name,
+            status: lead.status
+          },
+          orderCount,
+          expectedOrders,
+          lastOrderDate: orders.length > 0 ? orders[orders.length - 1].createdAt : null
+        });
+      }
+    }
+
+    res.json({
+      underperformingAccounts,
+      timeframe,
+      threshold
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching underperforming accounts' });
+  }
+};
+

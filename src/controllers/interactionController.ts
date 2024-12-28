@@ -1,28 +1,44 @@
 import { Request, Response } from "express";
 import { Interaction } from "../models/interaction";
+import { Lead } from "../models/lead";
 import moment from "moment-timezone";
 
-// Add Interaction
 export const addInteraction = async (req: Request, res: Response) => {
   try {
-    const { nextCallDate, perferedTimezone, leadId, type, details } = req.body;
+    const { leadId, nextCallDate, notes, duration } = req.body;
 
-    // Validate required fields
-    if (!leadId || !type || !details || !nextCallDate || !perferedTimezone) {
-      return res.status(400).json({ error: "Missing required fields" });
+    const userId = req.userId;
+
+    if (!leadId) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
     }
 
-    // Validate timezone format
-    if (!moment.tz.zone(perferedTimezone)) {
-      return res.status(400).json({ error: "Invalid timezone" });
+    // Fetch the lead to get preferredTimezone
+    const lead = await Lead.findById(leadId);
+    if (!lead) {
+      res.status(404).json({ error: "Lead not found" });
+      return;
     }
 
-    const utcNextCallDate = moment.tz(nextCallDate, perferedTimezone).utc().toDate();
+    const preferredTimezone = lead.preferredTimezone;
 
+    // Create the interaction
     const interaction = new Interaction({
-      perferedTimezone, leadId, type, details,
-      nextCallDate: utcNextCallDate
+      userId, 
+      leadId,
+      type: "Call",
+      notes,
+      duration 
     });
+
+    // If nextCallDate is provided, update the lead's nextCallDate
+    if (nextCallDate) {
+      const utcNextCallDate = moment.tz(nextCallDate, preferredTimezone).utc().toDate();
+      lead.nextCallDate = utcNextCallDate; 
+      await lead.save(); 
+    }
+
     await interaction.save();
     res.status(201).json(interaction);
   } catch (error: any) {
@@ -30,14 +46,14 @@ export const addInteraction = async (req: Request, res: Response) => {
   }
 };
 
-// Get Interactions by Lead
+
 export const getInteractionsByLead = async (req: Request, res: Response) => {
   try {
     const { leadId } = req.params;
 
-    // Validate leadId
     if (!leadId) {
-      return res.status(400).json({ error: "leadId is required" });
+      res.status(400).json({ error: "leadId is required" });
+      return;
     }
 
     const interactions = await Interaction.find({ leadId });

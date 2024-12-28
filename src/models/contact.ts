@@ -32,8 +32,8 @@ const ContactSchema: Schema = new Schema<IContact>({
       validator: (v: string) => /^\+?[1-9]\d{1,14}$/.test(v), 
       message: props => `${props.value} is not a valid phone number!` 
     },
-    minlength: 10, // Phone number must be at least 10 characters long
-    maxlength: 15 // Phone number can be at most 15 characters long
+    minlength: 10,
+    maxlength: 15
   },
   email: { 
     type: String, 
@@ -42,7 +42,7 @@ const ContactSchema: Schema = new Schema<IContact>({
       validator: (v: string) => /^\S+@\S+\.\S+$/.test(v), 
       message: props => `${props.value} is not a valid email!` 
     },
-    maxlength: 100 // Email can be at most 100 characters long
+    maxlength: 100
   },
   createdAt: { 
     type: Date, 

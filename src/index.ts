@@ -8,8 +8,9 @@ import { auth } from "./middleware/auth";
 import userRoutes from "./routes/userRoutes";
 import leadRoutes from "./routes/leadRoutes";
 import contactRoutes from "./routes/contactRoutes";
-// import performanceRoutes from "./routes/performanceRoutes";
+import performanceRoutes from "./routes/performanceRoutes";
 import interactionRoutes from "./routes/interactionRoutes";
+import orderRoutes from "./routes/orderRoutes";
 
 dotenv.config();
 
@@ -30,8 +31,9 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/leads', auth , leadRoutes);
 app.use("/api/contacts", contactRoutes);
-// app.use("/api/performance", auth, performanceRoutes);
+app.use("/api/performance", auth, performanceRoutes);
 app.use("/api/interactions", auth, interactionRoutes);
+app.use("/api/order", auth, orderRoutes);
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.json({ message: "Server is working!!!" });

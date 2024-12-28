@@ -1,9 +1,11 @@
-// import express from "express";
-// import { addPerformance, getPerformanceByLead } from "../controllers/performanceController";
+import express from 'express';
+import { getAccountPerformance, getOrderingPatterns, getUnderperformingAccounts } from '../controllers/performanceController';
+import { auth } from '../middleware/auth';
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.post("/", addPerformance);
-// router.get("/:leadId", getPerformanceByLead);
+router.get('/account/:leadId', auth, getAccountPerformance);
+router.get('/patterns/:leadId', auth, getOrderingPatterns);
+router.get('/underperforming', auth, getUnderperformingAccounts);
 
-// export default router;
+export default router;
