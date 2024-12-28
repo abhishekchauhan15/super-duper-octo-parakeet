@@ -40,7 +40,7 @@ export const addInteraction = async (req: Request, res: Response) => {
     }
 
     await interaction.save();
-    res.status(201).json(interaction);
+    res.status(201).json({message: "Interaction updated successfully"});
   } catch (error: any) {
     res.status(500).json({ error: "Error adding interaction", message: error.message });
   }

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Lead } from "../models/lead";
+import moment from 'moment';
 
 export const createLead = async (req: Request, res: Response) => {
   try {
@@ -111,4 +112,17 @@ export const deleteLead = async (req: Request, res: Response) => {
 } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
+};
+
+export const getLeadsRequiringCallsToday = async (req: Request, res: Response) => {
+    try {
+        const today = moment().startOf('day');
+        const leads = await Lead.find({
+            nextCallDate: { $lte: today.toDate() }
+        });
+
+        res.status(200).json(leads);
+    } catch (error: any) {
+        res.status(500).json({ error: "Error fetching leads requiring calls", message: error.message });
+    }
 };

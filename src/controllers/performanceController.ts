@@ -3,35 +3,52 @@ import { Order, IOrder } from '../models/order';
 import { Lead } from '../models/lead';
 import { Types } from 'mongoose';
 
-export const getAccountPerformance = async (req: Request, res: Response) => {
+
+export const getWellPerformingAccounts = async (req: Request, res: Response) => {
   try {
-    const { leadId } = req.params;
     const timeframe = req.query.timeframe || '30'; // Default to 30 days
+    const threshold = req.query.threshold || '5'; // Minimum expected orders
 
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(timeframe as string));
 
-    const orders = await Order.find({
-      leadId: new Types.ObjectId(leadId),
-      createdAt: { $gte: startDate, $lte: endDate }
-    });
+    console.log("startDate",startDate, "endDate", endDate)
 
-    const totalOrders = orders.length;
-    const totalValue = orders.reduce((sum: number, order: IOrder) => sum + order.amount, 0);
-    const averageOrderValue = totalOrders > 0 ? totalValue / totalOrders : 0;
+    const leads = await Lead.find();
+    const wellPerformingAccounts = [];
+
+    for (const lead of leads) {
+      const orders = await Order.find({
+        leadId: lead._id,
+        createdAt: { $gte: startDate, $lte: endDate }
+      });
+
+      const orderCount = orders.length;
+
+      if (orderCount >= parseInt(threshold as string)) {
+        wellPerformingAccounts.push({
+          lead: {
+            _id: lead._id,
+            name: lead.name,
+            status: lead.status
+          },
+          orderCount
+        });
+      }
+    }
 
     res.json({
-      totalOrders,
-      totalValue,
-      averageOrderValue,
-      timeframe
+      wellPerformingAccounts,
+      timeframe,
+      threshold
     });
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching account performance' });
+    res.status(500).json({ error: 'Error fetching well-performing accounts' });
   }
 };
 
+// Monitor ordering patterns
 export const getOrderingPatterns = async (req: Request, res: Response) => {
   try {
     const { leadId } = req.params;
@@ -46,16 +63,16 @@ export const getOrderingPatterns = async (req: Request, res: Response) => {
       createdAt: { $gte: startDate, $lte: endDate }
     }).sort({ createdAt: 1 });
 
-    // Calculate ordering patterns
     const orderDates = orders.map((order: IOrder) => order.createdAt);
     const intervals: number[] = [];
+
     for (let i = 1; i < orderDates.length; i++) {
-      const diff = orderDates[i].getTime() - orderDates[i-1].getTime();
+      const diff = orderDates[i].getTime() - orderDates[i - 1].getTime();
       intervals.push(diff / (1000 * 60 * 60 * 24)); // Convert to days
     }
 
-    const averageInterval = intervals.length > 0 
-      ? intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length 
+    const averageInterval = intervals.length > 0
+      ? intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length
       : 0;
 
     res.json({
@@ -69,6 +86,7 @@ export const getOrderingPatterns = async (req: Request, res: Response) => {
   }
 };
 
+// Identify underperforming accounts
 export const getUnderperformingAccounts = async (req: Request, res: Response) => {
   try {
     const timeframe = req.query.timeframe || '30'; // Default to 30 days
@@ -78,7 +96,6 @@ export const getUnderperformingAccounts = async (req: Request, res: Response) =>
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(timeframe as string));
 
-    // Get all leads
     const leads = await Lead.find();
     const underperformingAccounts = [];
 
@@ -114,4 +131,3 @@ export const getUnderperformingAccounts = async (req: Request, res: Response) =>
     res.status(500).json({ error: 'Error fetching underperforming accounts' });
   }
 };
-

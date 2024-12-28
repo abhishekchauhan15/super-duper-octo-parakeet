@@ -20,8 +20,6 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-
-// Use morgan for logging HTTP requests
 app.use(morgan("combined"));
 
 // Connect to MongoDB

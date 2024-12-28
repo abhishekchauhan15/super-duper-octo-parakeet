@@ -3,7 +3,6 @@ import { createOrder, getAllOrders, getOrderById } from "../controllers/orderCon
 
 const router = Router();
 
-// Define routes
 router.post("/", createOrder);
 router.get("/", getAllOrders);
 router.get("/:id", getOrderById); 
