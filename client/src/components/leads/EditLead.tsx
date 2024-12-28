@@ -9,6 +9,7 @@ import { leadService } from '../../services/leadService';
 import { UpdateLeadData, Lead } from '../../types/lead';
 import ContactsList from '../contacts/ContactsList';
 import AddContact from '../contacts/AddContact';
+import InteractionsList from '../interactions/InteractionsList';
 
 export default function EditLead() {
   const navigate = useNavigate();
@@ -98,8 +99,8 @@ export default function EditLead() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col bg-gray-50 px-4 py-12">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <h2 className="text-3xl font-bold text-center">Edit Lead</h2>
           <p className="text-center text-muted-foreground">Update lead information</p>
@@ -226,7 +227,11 @@ export default function EditLead() {
         </form>
       </Card>
 
-      <div className="mt-8">
+      <div className="mt-8 w-full max-w-2xl mx-auto">
+        <InteractionsList leadId={id!} />
+      </div>
+
+      <div className="mt-8 w-full max-w-2xl mx-auto">
         {showAddContact ? (
           <AddContact
             initialLeadId={id!}
