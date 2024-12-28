@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Lead } from '../../types/lead';
 import { leadService } from '../../services/leadService';
 import InteractionsList from '../interactions/InteractionsList';
 import AddInteraction from '../interactions/AddInteraction';
+import OrdersList from '../orders/OrdersList';
 
 interface LeadInteractionsProps {
   leadId: string;
@@ -58,17 +59,26 @@ export default function LeadInteractions({ leadId, onClose }: LeadInteractionsPr
             <Button variant="outline" onClick={onClose}>Close</Button>
           </div>
 
-          <div className="mt-8">
-            {showAddForm ? (
-              <AddInteraction
-                leadId={leadId}
-                onSuccess={() => setShowAddForm(false)}
-                onCancel={() => setShowAddForm(false)}
-              />
-            ) : (
-              <InteractionsList leadId={leadId} />
-            )}
-          </div>
+          <Tabs defaultValue="interactions" className="mt-8">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="interactions">Interactions</TabsTrigger>
+              <TabsTrigger value="orders">Orders</TabsTrigger>
+            </TabsList>
+            <TabsContent value="interactions">
+              {showAddForm ? (
+                <AddInteraction
+                  leadId={leadId}
+                  onSuccess={() => setShowAddForm(false)}
+                  onCancel={() => setShowAddForm(false)}
+                />
+              ) : (
+                <InteractionsList leadId={leadId} />
+              )}
+            </TabsContent>
+            <TabsContent value="orders">
+              <OrdersList leadId={leadId} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

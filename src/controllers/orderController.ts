@@ -38,18 +38,12 @@ export const getAllOrders = async (req: Request, res: Response) => {
 };
 
 
-export const getOrderById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const order = await Order.findById(id).populate("leadId");
-
-    if (!order) {
-       res.status(404).json({ error: "Order not found" });
-       return;
+export const getOrdersByLeadId = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const orders = await Order.find({ leadId: id }).populate("leadId");
+      res.status(200).json(orders);
+    } catch (error: any) {
+      res.status(500).json({ error: "Error fetching orders", message: error.message });
     }
-
-    res.status(200).json(order);
-  } catch (error: any) {
-    res.status(500).json({ error: "Error fetching order", message: error.message });
-  }
-}; 
+};
