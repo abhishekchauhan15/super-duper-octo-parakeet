@@ -5,6 +5,8 @@ import Register from './components/auth/Register';
 import LeadsList from './components/leads/LeadsList';
 import CreateLead from './components/leads/CreateLead';
 import EditLead from './components/leads/EditLead';
+import ContactsPage from './pages/ContactsPage';
+import Layout from './components/layout/Layout';
 import { getAuthToken } from './utils/auth';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -15,7 +17,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <>{children}</>;
+  return <Layout>{children}</Layout>;
 }
 
 function App() {
@@ -46,6 +48,14 @@ function App() {
           element={
             <ProtectedRoute>
               <EditLead />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contacts"
+          element={
+            <ProtectedRoute>
+              <ContactsPage />
             </ProtectedRoute>
           }
         />

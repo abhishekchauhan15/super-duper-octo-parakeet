@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { CreateLeadData, UpdateLeadData, Lead } from '../types/lead';
 import { getAuthToken } from '../utils/auth';
+import { config } from '../config';
 
-const API_URL = 'http://localhost:3000/api/leads';
+const API_URL = `${config.apiBaseUrl}/leads`;
 
 // Configure axios with default headers
 const api = axios.create({

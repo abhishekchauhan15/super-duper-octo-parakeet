@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RegisterFormData } from '../../types/auth';
+import { config } from '../../config';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/users/register', formData);
+      const response = await axios.post(`${config.apiBaseUrl}/users/register`, formData);
       toast.success(response.data.message);
       navigate('/login');
     } catch (error: any) {

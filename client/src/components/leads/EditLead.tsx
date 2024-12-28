@@ -7,6 +7,8 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { leadService } from '../../services/leadService';
 import { UpdateLeadData, Lead } from '../../types/lead';
+import ContactsList from '../contacts/ContactsList';
+import AddContact from '../contacts/AddContact';
 
 export default function EditLead() {
   const navigate = useNavigate();
@@ -23,6 +25,7 @@ export default function EditLead() {
     lastInteractionDate: undefined,
     pointsOfContact: []
   });
+  const [showAddContact, setShowAddContact] = useState(false);
 
   useEffect(() => {
     fetchLead();
@@ -222,6 +225,23 @@ export default function EditLead() {
           </CardFooter>
         </form>
       </Card>
+
+      <div className="mt-8">
+        {showAddContact ? (
+          <AddContact
+            initialLeadId={id!}
+            onSuccess={() => {
+              setShowAddContact(false);
+            }}
+            onCancel={() => setShowAddContact(false)}
+          />
+        ) : (
+          <ContactsList
+            leadId={id!}
+            onAddContact={() => setShowAddContact(true)}
+          />
+        )}
+      </div>
     </div>
   );
 } 

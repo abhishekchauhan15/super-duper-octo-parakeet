@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { LoginFormData } from '../../types/auth';
 import { setAuthToken } from '../../utils/auth';
+import { config } from '../../config';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/users/login', formData);
+      const response = await axios.post(`${config.apiBaseUrl}/users/login`, formData);
       toast.success(response.data.message);
       setAuthToken(response.data.token);
       navigate('/leads');
