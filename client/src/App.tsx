@@ -6,6 +6,7 @@ import LeadsList from './components/leads/LeadsList';
 import CreateLead from './components/leads/CreateLead';
 import EditLead from './components/leads/EditLead';
 import ContactsPage from './pages/ContactsPage';
+import PerformancePage from './pages/PerformancePage';
 import Layout from './components/layout/Layout';
 import { getAuthToken } from './utils/auth';
 
@@ -56,6 +57,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ContactsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/performance"
+          element={
+            <ProtectedRoute>
+              <PerformancePage />
             </ProtectedRoute>
           }
         />

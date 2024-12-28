@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CreateLeadData, UpdateLeadData, Lead } from '../types/lead';
+import { CreateLeadData, UpdateLeadData, Lead, CallPlanningLead } from '../types/lead';
 import { getAuthToken } from '../utils/auth';
 import { config } from '../config';
 
@@ -25,7 +25,7 @@ api.interceptors.request.use((config) => {
 export const leadService = {
   createLead: async (data: CreateLeadData): Promise<Lead> => {
     const response = await api.post('', data);
-    return response.data.lead;
+    return response.data;
   },
 
   getAllLeads: async (): Promise<Lead[]> => {
@@ -35,7 +35,7 @@ export const leadService = {
 
   getLeadById: async (id: string): Promise<Lead> => {
     const response = await api.get(`/${id}`);
-    return response.data.lead;
+    return response.data;
   },
 
   getLeadStatus: async (id: string): Promise<string> => {
@@ -52,7 +52,7 @@ export const leadService = {
     await api.delete(`/${id}`);
   },
 
-  getLeadsRequiringCallsToday: async (): Promise<Lead[]> => {
+  getTodayCallPlanning: async (): Promise<CallPlanningLead[]> => {
     const response = await api.get('/call-planning/today');
     return response.data;
   }
