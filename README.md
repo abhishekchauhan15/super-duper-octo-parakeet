@@ -7,6 +7,15 @@ A comprehensive system for managing restaurant accounts, tracking interactions, 
 - Backend: [http://35.175.136.171:3000/api](http://35.175.136.171:3000)
 
 
+Frontend Images 
+![image](https://github.com/user-attachments/assets/0c179bbe-af09-4cbf-a0a3-0928c98cbe45)
+![image](https://github.com/user-attachments/assets/79c1a2cf-84fc-4895-ad2e-88ae6dd0260e)
+![image](https://github.com/user-attachments/assets/6b450408-8316-46d7-8982-1aefa26e6193)
+
+
+
+
+
 ## 🚀 Features
 
 - Account/Lead Management
@@ -155,6 +164,7 @@ GET    /api/performance/patterns/:leadId - Get ordering patterns for a lead
 ```
 
 
+
 ## 🔄 CI/CD Pipeline
 
 Our GitHub Actions pipeline includes:
@@ -178,6 +188,9 @@ Our GitHub Actions pipeline includes:
    - Automated deployment to staging
    - Manual approval for production
    - Environment configuration
+
+![image](https://github.com/user-attachments/assets/952631d0-f964-4ce0-970d-74bc93e17da7)
+
 
 ## 🚀 Populate database with sample data
 
