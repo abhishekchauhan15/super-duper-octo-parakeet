@@ -103,7 +103,12 @@ Project: KAM
 
 ## 📝 API Documentation
 
+
+### Postman Collection
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/24775685-12413263-7ca4-4d85-b88c-2d42f2580497?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D24775685-12413263-7ca4-4d85-b88c-2d42f2580497%26entityType%3Dcollection%26workspaceId%3D2424e103-042f-4749-9d5c-8db76276953a)
+
 ### Authentication Endpoints
+
 ```
 POST /api/users/register
 POST /api/users/login

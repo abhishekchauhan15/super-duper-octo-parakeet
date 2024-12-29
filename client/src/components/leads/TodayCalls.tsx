@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { leadService } from '../../services/leadService';
 import { CallPlanningLead } from '../../types/lead';
 
 export default function TodayCalls() {
   const [leads, setLeads] = useState<CallPlanningLead[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchLeads();
