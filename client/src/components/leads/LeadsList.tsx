@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import moment from 'moment-timezone';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { leadService } from '../../services/leadService';
@@ -33,6 +34,37 @@ export default function LeadsList() {
     setSelectedLeadId(leadId);
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'new':
+        return 'bg-blue-100 text-blue-800';
+      case 'contacted':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'qualified':
+        return 'bg-green-100 text-green-800';
+      case 'closed':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getNextCallDate = (lead: Lead) => {
+    if (!lead.lastInteractionDate || !lead.callFrequency) return null;
+    const lastCall = moment(lead.lastInteractionDate);
+    return lastCall.add(lead.callFrequency, 'days');
+  };
+
+  const getNextCallHighlight = (nextCall: moment.Moment | null) => {
+    if (!nextCall) return 'bg-gray-100 text-gray-800';
+    const today = moment();
+    const daysUntilCall = nextCall.diff(today, 'days');
+
+    if (daysUntilCall < 0) return 'bg-red-100 text-red-800';
+    if (daysUntilCall === 0) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-green-100 text-green-800';
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center py-8">Loading leads...</div>;
   }
@@ -56,37 +88,48 @@ export default function LeadsList() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {leads.map((lead) => (
-              <Card 
-                key={lead._id} 
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => handleLeadClick(lead._id)}
-              >
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold">{lead.name}</h3>
-                      <p className="text-sm text-muted-foreground">Status: {lead.status}</p>
+            {leads.map((lead) => {
+              const nextCall = getNextCallDate(lead);
+              return (
+                <Card 
+                  key={lead._id} 
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => handleLeadClick(lead._id)}
+                >
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold">{lead.name}</h3>
+                      </div>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(lead.status)}`}>
+                        {lead.status}
+                      </span>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <p className="text-sm">
-                    <span className="font-medium">Address:</span> {lead.address}
-                  </p>
-                  {lead.type && (
+                  </CardHeader>
+                  <CardContent className="space-y-2">
                     <p className="text-sm">
-                      <span className="font-medium">Type:</span> {lead.type}
+                      <span className="font-medium">Address:</span> {lead.address}
                     </p>
-                  )}
-                  {lead.callFrequency && (
-                    <p className="text-sm">
-                      <span className="font-medium">Call Frequency:</span> {lead.callFrequency}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    {lead.type && (
+                      <p className="text-sm">
+                        <span className="font-medium">Type:</span> {lead.type}
+                      </p>
+                    )}
+                    {lead.callFrequency && (
+                      <p className="text-sm">
+                        <span className="font-medium">Call Frequency:</span> {lead.callFrequency} days
+                      </p>
+                    )}
+                    {nextCall && (
+                      <div className={`mt-2 rounded-md px-2.5 py-1.5 text-sm ${getNextCallHighlight(nextCall)}`}>
+                        <span className="font-medium">Next Call:</span>{' '}
+                        {nextCall.format('MMM D, YYYY')}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

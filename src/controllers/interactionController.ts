@@ -6,7 +6,6 @@ import moment from "moment-timezone";
 export const addInteraction = async (req: Request, res: Response) => {
   try {
     const { leadId, nextCallDate, notes, duration } = req.body;
-
     const userId = req.userId;
 
     if (!leadId) {
@@ -14,7 +13,7 @@ export const addInteraction = async (req: Request, res: Response) => {
       return;
     }
 
-    // Fetch the lead to get preferredTimezone
+    // Fetch the lead to get preferredTimezone and callFrequency
     const lead = await Lead.findById(leadId);
     if (!lead) {
       res.status(404).json({ error: "Lead not found" });
@@ -32,15 +31,22 @@ export const addInteraction = async (req: Request, res: Response) => {
       duration 
     });
 
-    // If nextCallDate is provided, update the lead's nextCallDate
-    if (nextCallDate) {
-      const utcNextCallDate = moment.tz(nextCallDate, preferredTimezone).utc().toDate();
-      lead.nextCallDate = utcNextCallDate; 
-      await lead.save(); 
-    }
+    // Calculate next call date based on call frequency
+    // If nextCallDate is provided in the request, use that instead
+    const calculatedNextCallDate = nextCallDate 
+      ? moment.tz(nextCallDate, preferredTimezone).utc().toDate()
+      : moment().add(lead.callFrequency, 'days').toDate();
+
+    // Update the lead with new interaction date and next call date
+    lead.lastInteractionDate = new Date();
+    lead.nextCallDate = calculatedNextCallDate;
+    await lead.save();
 
     await interaction.save();
-    res.status(201).json({message: "Interaction updated successfully"});
+    res.status(201).json({
+      message: "Interaction added successfully",
+      nextCallDate: calculatedNextCallDate
+    });
   } catch (error: any) {
     res.status(500).json({ error: "Error adding interaction", message: error.message });
   }

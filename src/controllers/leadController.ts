@@ -4,14 +4,26 @@ import moment from 'moment';
 
 export const createLead = async (req: Request, res: Response) => {
   try {
-    const { name, address, status , callFrequency , preferredTimezone} = req.body;
+    const { name, address, status, callFrequency, preferredTimezone } = req.body;
 
-    if (!name || !address  || !status || callFrequency === undefined) {
-       res.status(400).json({ error: "All fields are required" });
-       return
+    if (!name || !address || !status || callFrequency === undefined) {
+      res.status(400).json({ error: "All fields are required" });
+      return;
     }
 
-    const lead = new Lead({ name, address,status, callFrequency, preferredTimezone});
+    // Calculate nextCallDate based on callFrequency (in days)
+    const nextCallDate = moment().add(callFrequency, 'days').toDate();
+
+    const lead = new Lead({ 
+      name, 
+      address, 
+      status, 
+      callFrequency, 
+      preferredTimezone,
+      nextCallDate, 
+      lastInteractionDate: new Date()
+    });
+    
     await lead.save();
     res.status(201).json({ message: "Lead created successfully", lead });
   } catch (error: any) {
@@ -49,52 +61,25 @@ export const updateLead = async (req: Request, res: Response) => {
 
     const lead = await Lead.findById(req.params.id);
     if (!lead) {
-       res.status(404).json({ message: "Lead not found" });
-      return
+      res.status(404).json({ message: "Lead not found" });
+      return;
     }
 
-    if (name) lead.name = name;
-
-    if (address) lead.address = address;
-
-    if (type) {
-      const validTypes = ["Resturant", "Dabha"];
-      if (!validTypes.includes(type)) {
-         res.status(400).json({ error: "Invalid type" });
-        return
-      }
-      lead.type = type;
+    // If callFrequency is being updated, recalculate nextCallDate
+    if (callFrequency !== undefined && callFrequency !== lead.callFrequency) {
+      // If there's a lastInteractionDate, calculate from that, otherwise use current date
+      const baseDate = lead.lastInteractionDate || new Date();
+      req.body.nextCallDate = moment(baseDate).add(callFrequency, 'days').toDate();
     }
 
-    if (status) {
-      const validStatuses = ["New", "Contacted", "Qualified", "Closed"];
-      if (!validStatuses.includes(status)) {
-         res.status(400).json({ error: "Invalid status" });
-        return
-      }
-      lead.status = status;
-    }
+    // Update the lead with all provided fields
+    const updatedLead = await Lead.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body },
+      { new: true, runValidators: true }
+    );
 
-    if (callFrequency !== undefined) {
-      if (typeof callFrequency !== 'number' || callFrequency <= 0) {
-        res.status(400).json({ error: "Call frequency must be a positive number" });
-        return
-      }
-      lead.callFrequency = callFrequency;
-    }
-
-    if (lastInteractionDate) {
-      if (isNaN(new Date(lastInteractionDate).getTime())) {
-         res.status(400).json({ error: "Invalid last called date" });
-        return
-      }
-      lead.lastInteractionDate = lastInteractionDate;
-    }
-    if (pointsOfContact) lead.pointsOfContact = pointsOfContact;
-
-    lead.updatedAt = new Date();
-    await lead.save();
-    res.status(200).json({ message: "Lead updated successfully", lead });
+    res.status(200).json({ message: "Lead updated successfully", lead: updatedLead });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

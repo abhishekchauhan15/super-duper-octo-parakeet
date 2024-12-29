@@ -3,6 +3,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { contactService } from '../../services/contactService';
 
 interface AddContactProps {
@@ -32,10 +33,13 @@ export default function AddContact({ initialLeadId, onSuccess, onCancel }: AddCo
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleRoleChange = (value: string) => {
+    setFormData({ ...formData, role: value });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
     if (!formData.name || !formData.role || !formData.phoneNumber || !formData.email) {
       toast.error('All fields are required');
       return;
@@ -90,14 +94,15 @@ export default function AddContact({ initialLeadId, onSuccess, onCancel }: AddCo
             <label htmlFor="role" className="text-sm font-medium">
               Role
             </label>
-            <Input
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              placeholder="e.g., Manager"
-            />
+            <Select value={formData.role} onValueChange={handleRoleChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Owner">Owner</SelectItem>
+                <SelectItem value="Manager">Manager</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

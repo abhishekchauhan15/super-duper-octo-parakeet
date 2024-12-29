@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import moment from 'moment-timezone';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
@@ -15,8 +16,16 @@ export default function CreateLead() {
     address: '',
     status: 'New',
     callFrequency: 2,
-    preferredTimezone: 'Europe/London'
+    preferredTimezone: 'Asia/Kolkata'
   });
+
+  const timezones = [
+    'Asia/Kolkata',
+    'Asia/Dubai',
+    'Europe/London',
+    'America/New_York',
+    'Australia/Sydney'
+  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
@@ -25,6 +34,10 @@ export default function CreateLead() {
 
   const handleStatusChange = (value: string) => {
     setFormData({ ...formData, status: value });
+  };
+
+  const handleTimezoneChange = (value: string) => {
+    setFormData({ ...formData, preferredTimezone: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,13 +124,18 @@ export default function CreateLead() {
               <label htmlFor="preferredTimezone" className="text-sm font-medium">
                 Preferred Timezone
               </label>
-              <Input
-                id="preferredTimezone"
-                name="preferredTimezone"
-                value={formData.preferredTimezone}
-                onChange={handleChange}
-                placeholder="e.g., Europe/London"
-              />
+              <Select value={formData.preferredTimezone} onValueChange={handleTimezoneChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select timezone" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timezones.map((tz) => (
+                    <SelectItem key={tz} value={tz}>
+                      {tz} ({moment.tz(tz).format('Z')})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
 
