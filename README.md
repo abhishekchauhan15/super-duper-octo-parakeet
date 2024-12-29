@@ -1,4 +1,3 @@
-# Key Account Management (KAM) System
 
 A comprehensive system for managing restaurant accounts, tracking interactions, and monitoring performance metrics.
 
