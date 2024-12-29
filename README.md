@@ -1,6 +1,12 @@
 
 A comprehensive system for managing restaurant accounts, tracking interactions, and monitoring performance metrics.
 
+## Deployment Information
+
+- Frontend: [http://35.175.136.171/](http://35.175.136.171/) (Deployed through Nginx)
+- Backend: [http://35.175.136.171:3000/api](http://35.175.136.171:3000)
+
+
 ## 🚀 Features
 
 - Account/Lead Management
