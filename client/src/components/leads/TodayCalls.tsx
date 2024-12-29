@@ -67,12 +67,8 @@ export default function TodayCalls() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <p className="text-sm">
-                  <span className="font-medium">Days Since Last Call:</span>{' '}
-                  {lead.daysSinceLastCall}
-                </p>
-                <p className="text-sm">
-                  <span className="font-medium">Next Call Due:</span>{' '}
-                  {formatDate(lead.nextCallDue)}
+                  <span className="font-medium">Next Call Date:</span>{' '}
+                  {formatDate(lead.nextCallDate)}
                 </p>
                 {lead.lastInteractionDate && (
                   <p className="text-sm">

@@ -25,7 +25,7 @@ export default function LeadInteractions({ leadId, onClose }: LeadInteractionsPr
   const fetchLead = async () => {
     try {
       const data = await leadService.getLeadById(leadId);
-      setLead(data);
+      setLead(data.lead as unknown as Lead);
     } catch (error) {
       toast.error('Failed to fetch lead details');
     } finally {

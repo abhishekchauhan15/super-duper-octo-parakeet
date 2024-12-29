@@ -1,4 +1,5 @@
 export interface Lead {
+  lead(lead: any): unknown;
   _id: string;
   name: string;
   address: string;
@@ -34,5 +35,5 @@ export interface UpdateLeadData {
 
 export interface CallPlanningLead extends Lead {
   daysSinceLastCall: number;
-  nextCallDue: Date;
+  nextCallDate: Date;
 } 
