@@ -182,39 +182,108 @@ npm run populate
 
 ## 📊 Data Models
 
-### Lead
-- Name
-- Address
-- Type (Restaurant/Dhaba)
-- Status
-- Call Frequency
-- Points of Contact
-- Next Call Date
-- Preferred Timezone
+# MongoDB Schema Documentation
 
-### Contact
-- Name
-- Role
-- Phone Number
-- Email
-- Preferred Contact Time
-- Notes
 
-### Interaction
-- Type
-- Duration
-- Notes
-- Date
-- User ID
-- Lead ID
+---
 
-### Order
-- Amount
-- Status
-- Name
-- Quantity
-- Delivery Date
-- Lead ID
+## 1. User Schema
+
+### Fields
+| Field        | Type                | Required | Description                                                                                   |
+|--------------|---------------------|----------|-----------------------------------------------------------------------------------------------|
+| `userId`     | ObjectId            | No       | Reference to the user object.                                                                |
+| `name`       | String              | Yes      | Name of the user.                                                                             |
+| `email`      | String              | Yes      | User's email, unique and validated against an email format.                                   |
+| `password`   | String              | Yes      | Password, hashed before saving. Minimum length of 8 characters.                              |
+| `role`       | String              | Yes      | Role of the user (e.g., 'KAM').                                                              |
+
+### Methods
+- `comparePassword`: Compares the provided password with the hashed password.
+
+### Indexes
+None explicitly defined.
+
+---
+
+## 2. Order Schema
+
+### Fields
+| Field           | Type                | Required | Description                                                                                     |
+|------------------|---------------------|----------|-------------------------------------------------------------------------------------------------|
+| `leadId`        | ObjectId            | Yes      | Reference to a lead.                                                                            |
+| `amount`        | Number              | Yes      | Order amount, must be non-negative.                                                            |
+| `status`        | String (enum)       | No       | Status of the order (`PENDING`, `CONFIRMED`, `DELIVERED`, `CANCELLED`). Defaults to `PENDING`. |
+| `name`          | String              | Yes      | Name of the order.                                                                              |
+| `quantity`      | Number              | Yes      | Quantity of the order. Minimum value is 1.                                                     |
+| `deliveryDate`  | Date                | No       | Delivery date of the order.                                                                    |
+| `createdAt`     | Date                | No       | Timestamp of creation (auto-generated).                                                        |
+| `updatedAt`     | Date                | No       | Timestamp of last update (auto-generated).                                                     |
+
+### Indexes
+- `{ leadId: 1, createdAt: -1 }`
+- `{ status: 1 }`
+
+---
+
+## 3. Lead Schema
+
+### Fields
+| Field               | Type                | Required | Description                                                                                  |
+|---------------------|---------------------|----------|----------------------------------------------------------------------------------------------|
+| `name`             | String              | Yes      | Name of the lead.                                                                            |
+| `address`          | String              | Yes      | Address of the lead.                                                                         |
+| `type`             | String (enum)       | Yes      | Type of lead (`Resturant`, `Dabha`). Defaults to `Resturant`.                                |
+| `status`           | String (enum)       | Yes      | Status of the lead (`New`, `Contacted`, `Qualified`, `Closed`).                              |
+| `callFrequency`    | Number              | Yes      | Frequency of calls (in days).                                                               |
+| `lastInteractionDate` | Date              | No       | Date of the last interaction with the lead.                                                 |
+| `preferredTimezone` | String             | Yes      | Preferred timezone of the lead.                                                             |
+| `nextCallDate`     | Date                | No       | Date of the next scheduled call. Validates to ensure it is today or in the future.          |
+| `pointsOfContact`  | Array of ObjectId   | No       | References to points of contact.                                                            |
+| `lastOrderDate`    | Date                | No       | Date of the last order made by the lead.                                                    |
+| `createdAt`        | Date                | No       | Timestamp of creation (auto-generated).                                                    |
+| `updatedAt`        | Date                | No       | Timestamp of last update (auto-generated).                                                  |
+
+### Indexes
+- `{ status: 1, nextCallDate: 1 }`
+
+---
+
+## 4. Interaction Schema
+
+### Fields
+| Field        | Type                | Required | Description                                                                           |
+|--------------|---------------------|----------|---------------------------------------------------------------------------------------|
+| `leadId`     | ObjectId            | Yes      | Reference to a lead.                                                                 |
+| `userId`     | ObjectId            | Yes      | Reference to a user.                                                                 |
+| `type`       | String (enum)       | Yes      | Type of interaction (`Call`, `Email`). Defaults to `Call`.                           |
+| `duration`   | Number              | No       | Duration of the interaction (in minutes).                                            |
+| `notes`      | String              | No       | Notes from the interaction, up to 500 characters.                                    |
+| `date`       | Date                | No       | Date of the interaction. Defaults to the current date.                               |
+| `createdAt`  | Date                | No       | Timestamp of creation (auto-generated).                                              |
+| `updatedAt`  | Date                | No       | Timestamp of last update (auto-generated).                                           |
+
+### Indexes
+- `{ leadId: 1, createdAt: -1 }`
+- `{ userId: 1, createdAt: -1 }`
+
+---
+
+## 5. Contact Schema
+
+### Fields
+| Field         | Type                | Required | Description                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------|
+| `leadId`      | ObjectId            | Yes      | Reference to a lead.                                                                     |
+| `name`        | String              | Yes      | Name of the contact.                                                                     |
+| `role`        | String (enum)       | Yes      | Role of the contact (`Owner`, `Manager`).                                                |
+| `phoneNumber` | String              | Yes      | Phone number of the contact, validated against international formats.                    |
+| `email`       | String              | Yes      | Email of the contact, validated against an email format.                                 |
+| `createdAt`   | Date                | No       | Timestamp of creation (auto-generated).                                                 |
+| `updatedAt`   | Date                | No       | Timestamp of last update (auto-generated).                                              |
+
+---
+
 
 ## 🔐 Authentication
 
