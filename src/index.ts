@@ -31,14 +31,17 @@ app.use('/api/leads', auth , leadRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/performance", auth, performanceRoutes);
 app.use("/api/interactions", auth, interactionRoutes);
-app.use("/api/order", auth, orderRoutes);
+app.use("/api/orders", auth, orderRoutes);
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.json({ message: "Server is working!!!" });
 });
 
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
+// Only start the server if we're not in a test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () =>
+    console.log(`Server running on http://localhost:${PORT}`)
+  );
+}
 
 export default app;

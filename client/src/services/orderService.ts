@@ -3,7 +3,7 @@ import { Order, CreateOrderData } from '../types/order';
 import { getAuthToken } from '../utils/auth';
 import { config } from '../config';
 
-const API_URL = `${config.apiBaseUrl}/order`;
+const API_URL = `${config.apiBaseUrl}/orders`;
 
 const api = axios.create({
   baseURL: API_URL,

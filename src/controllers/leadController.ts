@@ -104,7 +104,7 @@ export const getLeadsRequiringCallsToday = async (req: Request, res: Response) =
         const today = moment().startOf('day');
         const leads = await Lead.find({
             nextCallDate: { $lte: today.toDate() }
-        });
+        }).populate("pointsOfContact");
 
         res.status(200).json(leads);
     } catch (error: any) {

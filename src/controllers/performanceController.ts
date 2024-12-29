@@ -3,17 +3,14 @@ import { Order, IOrder } from '../models/order';
 import { Lead } from '../models/lead';
 import { Types } from 'mongoose';
 
-
-export const getWellPerformingAccounts = async (req: Request, res: Response) => {
+export const getWellPerformingAccounts = async (req: Request, res: Response): Promise<void> => {
   try {
     const timeframe = req.query.timeframe || '30'; // Default to 30 days
-    const threshold = req.query.threshold || '5'; // Minimum expected orders
+    const threshold = req.query.threshold || '1'; // Lower threshold for testing
 
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(timeframe as string));
-
-    console.log("startDate",startDate, "endDate", endDate)
 
     const leads = await Lead.find();
     const wellPerformingAccounts = [];
@@ -25,7 +22,6 @@ export const getWellPerformingAccounts = async (req: Request, res: Response) => 
       });
 
       const orderCount = orders.length;
-
       if (orderCount >= parseInt(threshold as string)) {
         wellPerformingAccounts.push({
           lead: {
@@ -33,7 +29,8 @@ export const getWellPerformingAccounts = async (req: Request, res: Response) => 
             name: lead.name,
             status: lead.status
           },
-          orderCount
+          orderCount,
+          lastOrderDate: orders.length > 0 ? orders[orders.length - 1].createdAt : null
         });
       }
     }
@@ -48,11 +45,16 @@ export const getWellPerformingAccounts = async (req: Request, res: Response) => 
   }
 };
 
-// Monitor ordering patterns
-export const getOrderingPatterns = async (req: Request, res: Response) => {
+export const getOrderingPatterns = async (req: Request, res: Response): Promise<void> => {
   try {
     const { leadId } = req.params;
     const timeframe = req.query.timeframe || '90'; // Default to 90 days
+
+    const lead = await Lead.findById(leadId);
+    if (!lead) {
+      res.status(404).json({ error: 'Lead not found' });
+      return;
+    }
 
     const endDate = new Date();
     const startDate = new Date();
@@ -63,7 +65,7 @@ export const getOrderingPatterns = async (req: Request, res: Response) => {
       createdAt: { $gte: startDate, $lte: endDate }
     }).sort({ createdAt: 1 });
 
-    const orderDates = orders.map((order: IOrder) => order.createdAt);
+    const orderDates = orders.map(order => order.createdAt);
     const intervals: number[] = [];
 
     for (let i = 1; i < orderDates.length; i++) {
@@ -86,8 +88,7 @@ export const getOrderingPatterns = async (req: Request, res: Response) => {
   }
 };
 
-// Identify underperforming accounts
-export const getUnderperformingAccounts = async (req: Request, res: Response) => {
+export const getUnderperformingAccounts = async (req: Request, res: Response): Promise<void> => {
   try {
     const timeframe = req.query.timeframe || '30'; // Default to 30 days
     const threshold = req.query.threshold || '1'; // Minimum expected orders per month

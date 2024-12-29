@@ -10,6 +10,7 @@ export enum OrderStatus {
 export interface IOrder extends Document {
   leadId: Schema.Types.ObjectId;
   amount: number;
+  totalAmount?: number;
   status: OrderStatus;
   name: string;
   quantity: number;

@@ -11,7 +11,6 @@ interface ILead extends Document {
   lastInteractionDate: Date | null;
   preferredTimezone: string;
   nextCallDate: Date;
-  performanceRating: "High" | "Medium" | "Low";
   pointsOfContact: mongoose.Types.ObjectId[]; // Array of references to POCs
   lastOrderDate?: Date;
   createdAt: Date;
@@ -63,14 +62,13 @@ const LeadSchema: Schema = new Schema<ILead>({
     type: Date, 
     required: false,   
     validate: {
-      validator: (v: Date) => v > new Date(),
-      message: props => `Next call date must be in the future!`
+      validator: (v: Date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return v >= today;
+      },
+      message: props => `Next call date must be today or in the future!`
     }
-  },
-  performanceRating: { 
-    type: String, 
-    enum: ["High", "Medium", "Low"], 
-    required: false 
   },
   preferredTimezone: { 
     type: String, 
@@ -101,8 +99,6 @@ const LeadSchema: Schema = new Schema<ILead>({
 
 // Add indexes for efficient querying
 LeadSchema.index({ status: 1, nextCallDate: 1 });
-LeadSchema.index({ performanceRating: 1 });
-LeadSchema.index({ priorityScore: -1 });
 
 export const Lead = mongoose.model<ILead>("Lead", LeadSchema);
 export type { ILead };

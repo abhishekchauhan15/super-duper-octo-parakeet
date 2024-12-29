@@ -3,21 +3,21 @@ import { Interaction } from "../models/interaction";
 import { Lead } from "../models/lead";
 import moment from "moment-timezone";
 
-export const addInteraction = async (req: Request, res: Response) => {
+export const addInteraction = async (req: Request & { userId?: string }, res: Response) => {
   try {
     const { leadId, nextCallDate, notes, duration } = req.body;
     const userId = req.userId;
 
-    if (!leadId) {
-      res.status(400).json({ error: "Missing required fields" });
-      return;
+    if (!leadId || !userId) {
+       res.status(400).json({ error: "Missing required fields" });
+       return;
     }
 
     // Fetch the lead to get preferredTimezone and callFrequency
     const lead = await Lead.findById(leadId);
     if (!lead) {
-      res.status(404).json({ error: "Lead not found" });
-      return;
+       res.status(404).json({ error: "Lead not found" });
+       return;
     }
 
     const preferredTimezone = lead.preferredTimezone;
@@ -31,6 +31,8 @@ export const addInteraction = async (req: Request, res: Response) => {
       duration 
     });
 
+    await interaction.save();
+
     // Calculate next call date based on call frequency
     // If nextCallDate is provided in the request, use that instead
     const calculatedNextCallDate = nextCallDate 
@@ -42,7 +44,6 @@ export const addInteraction = async (req: Request, res: Response) => {
     lead.nextCallDate = calculatedNextCallDate;
     await lead.save();
 
-    await interaction.save();
     res.status(201).json({
       message: "Interaction added successfully",
       nextCallDate: calculatedNextCallDate
@@ -52,17 +53,19 @@ export const addInteraction = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getInteractionsByLead = async (req: Request, res: Response) => {
   try {
     const { leadId } = req.params;
 
     if (!leadId) {
-      res.status(400).json({ error: "leadId is required" });
-      return;
+       res.status(400).json({ error: "leadId is required" });
+       return;
     }
 
-    const interactions = await Interaction.find({ leadId });
+    const interactions = await Interaction.find({ leadId })
+      .sort({ createdAt: -1 })
+      .populate('userId', 'name email');
+      
     res.status(200).json(interactions);
   } catch (error: any) {
     res.status(500).json({ error: "Error fetching interactions", message: error.message });
