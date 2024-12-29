@@ -56,13 +56,13 @@ export default function TodayCalls() {
                     <h3 className="font-semibold">{lead.name}</h3>
                     <p className="text-sm text-muted-foreground">Status: {lead.status}</p>
                   </div>
-                  <Button
+                  {/* <Button
                     variant="outline"
                     size="sm"
                     onClick={() => navigate(`/leads/${lead._id}`)}
                   >
                     View Details
-                  </Button>
+                  </Button> */}
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
